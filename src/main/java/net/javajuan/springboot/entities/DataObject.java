@@ -1,4 +1,4 @@
-package net.javajuan.springboot;
+package net.javajuan.springboot.entities;
 
 import java.util.ArrayList;
 import java.util.List;
