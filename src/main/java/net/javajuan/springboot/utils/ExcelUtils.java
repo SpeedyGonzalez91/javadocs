@@ -1,4 +1,4 @@
-package net.javajuan.springboot;
+package net.javajuan.springboot.utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

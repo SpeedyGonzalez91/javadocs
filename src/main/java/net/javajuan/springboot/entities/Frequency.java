@@ -1,4 +1,4 @@
-package net.javajuan.springboot;
+package net.javajuan.springboot.entities;
 
 public class Frequency {
     public static final String KIOSK_GROUP_ID_LABEL = "KioskGroupId";

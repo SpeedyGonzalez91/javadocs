@@ -1,7 +1,6 @@
-package net.javajuan.springboot;
+package net.javajuan.springboot.controllers;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,32 +10,24 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtils;
+import net.javajuan.springboot.entities.DataObject;
+import net.javajuan.springboot.entities.Frequency;
+import net.javajuan.springboot.services.GraphService;
+
 import javax.servlet.http.HttpSession;
-import org.jfree.chart.JFreeChart;
-import org.jfree.data.category.DefaultCategoryDataset;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.opencsv.CSVReader;
@@ -46,7 +37,7 @@ import com.opencsv.exceptions.CsvValidationException;
 
 
 
-@Controller
+//@Controller
 public class DashboardController {
 	
 
@@ -102,22 +93,22 @@ public class DashboardController {
     }
     
     
-    
-    @PostMapping(path = "/graph", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<byte[]> displayGraph(@RequestPart() MultipartFile file) throws IOException {
-        // Read the uploaded CSV file and retrieve the frequency data
-        List<DataObject> frequencyList = retrieveFrequencyDataFromFile(file);
-
-        // Generate the graph
-        byte[] graphBytes = generateGraph(frequencyList);
-
-        // Set the appropriate response headers
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_PNG);
-
-        // Return the graph image as a response
-        return new ResponseEntity<>(graphBytes, headers, HttpStatus.OK);
-    }
+//
+//    @PostMapping(path = "/graph", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+//    public ResponseEntity<byte[]> displayGraph(@RequestPart() MultipartFile file) throws IOException {
+//        // Read the uploaded CSV file and retrieve the frequency data
+//        List<DataObject> frequencyList = retrieveFrequencyDataFromFile(file);
+//
+//        // Generate the graph
+//        byte[] graphBytes = generateGraph(frequencyList);
+//
+//        // Set the appropriate response headers
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.IMAGE_PNG);
+//
+//        // Return the graph image as a response
+//        return new ResponseEntity<>(graphBytes, headers, HttpStatus.OK);
+//    }
 
     private List<DataObject> retrieveFrequencyDataFromFile(MultipartFile file) throws IOException {
         List<DataObject> frequencyList = new ArrayList<>();
@@ -134,8 +125,6 @@ public class DashboardController {
             }
         }catch(Exception e) {
         }
-        
-        
         return frequencyList;
     }
 
@@ -227,49 +216,6 @@ public class DashboardController {
 
         return frequencyList;
     }
-
-
-    private byte[] generateGraph(List<DataObject> dataList) throws IOException {
-        // Calculate the frequencies from the data
-        Map<String, Integer> labelFrequencies = new HashMap<>();
-
-        // Iterate over the data objects
-        for (DataObject data : dataList) {
-            List<String> labelList = data.getLabel();
-
-            // Iterate over the labels and update the frequency count
-            for (String label : labelList) {
-                labelFrequencies.put(label, labelFrequencies.getOrDefault(label, 0) + 1);
-            }
-        }
-
-        // Create a list of Frequency objects from the label frequencies
-        List<Frequency> frequencyList = new ArrayList<>();
-        for (Map.Entry<String, Integer> entry : labelFrequencies.entrySet()) {
-            String label = entry.getKey();
-            int frequency = entry.getValue();
-            frequencyList.add(new Frequency(label, frequency));
-        }
-
-        // Generate the graph using the frequency data
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        for (Frequency frequency : frequencyList) {
-            dataset.addValue(frequency.getFrequency(), "Frequency", frequency.getCategory());
-        }
-
-        JFreeChart chart = ChartFactory.createBarChart("Frequency Graph", "Category", "Frequency", dataset);
-
-        // Convert the chart to a byte array
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ChartUtils.writeChartAsPNG(outputStream, chart, 800, 400);
-        return outputStream.toByteArray();
-    }
-
-
-
-
-
-
 
 
 	public void setGraphService(GraphService graphService) {
