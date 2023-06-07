@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* CSS styles for the navbar */
+        .navbar {
+            background-color: #f8f9fa;
+            padding: 10px;
+        }
+        .navbar ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .navbar li {
+            float: left;
+            margin-right: 10px;
+        }
+        .navbar li a {
+            display: block;
+            color: #333;
+            text-align: center;
+            padding: 8px 16px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .navbar li a:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+    <label for="fileInput" class="uploadButton">Upload</label>
+    <input id="fileInput" type="file" style="display: none;">
+    <a href="/graph" id="graphButton">Graph</a>
+    <a href="/frequency-table">Frequency Table</a>
+    <a href="/download">Download</a>
+</div>
+
+<script>
+    // Trigger file input click when the upload button is clicked
+    const uploadButton = document.querySelector('.uploadButton');
+    const fileInput = document.getElementById('fileInput');
+    
+    uploadButton.addEventListener('click', function() {
+        fileInput.click();
+    });
+
+    // Handle file selection
+    fileInput.addEventListener('change', function(event) {
+        const selectedFile = event.target.files[0];
+        // Perform further processing or upload the file
+    });
+</script>
+
+    <h2>Graph</h2>
+<canvas id="graph"></canvas>
+<script>
+    function fetchGraphData() {
+        fetch("/upload/graph")
+            .then(response => response.json())
+            .then(data => {
+                var labels = data.map(item => item.category);
+                var frequencies = data.map(item => item.frequency);
+
+                var ctx = document.getElementById("graph").getContext("2d");
+                new Chart(ctx, {
+                    type: "bar",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: "Frequency",
+                            data: frequencies,
+                            backgroundColor: "rgba(75, 192, 192, 0.6)"
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                stepSize: 1
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error(error));
+    }
+
+    document.getElementById("graphButton").addEventListener("click", fetchGraphData);
+</script>
+
+
+    <h2 id="download">Download Graph Data</h2>
+    <form action="/download" method="get">
+        <button type="submit">Download Graph Data</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Graph</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Graph</h1>
+    <canvas id="graph"></canvas>
+
+    <script>
+        // Fetch the graph data from the server
+        fetch("/graph-data")
+            .then(response => response.json())
+            .then(data => {
+                // Extract the labels and data from the response
+                const labels = data.map(item => item.category);
+                const frequencies = data.map(item => item.frequency);
+
+                // Create the chart using Chart.js
+                const ctx = document.getElementById("graph").getContext("2d");
+                new Chart(ctx, {
+                    type: "bar",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: "Frequency",
+                            data: frequencies,
+                            backgroundColor: "rgba(75, 192, 192, 0.6)"
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                stepSize: 1
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error(error));
+    </script>
+</body>
+</html>
